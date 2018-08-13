@@ -1,15 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="0dp"
+    android:layout_margin="0dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.google.android.exoplayer2.ui.PlayerView
+        android:layout_width="match_parent"
+        android:layout_height="203dp"
+        android:layout_margin="0dp"
+        android:padding="0dp"
+        android:id="@+id/step_video_player"></com.google.android.exoplayer2.ui.PlayerView>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/ingredients"
-        android:id="@+id/test_tv"/>
-    <com.google.android.exoplayer2.ui.PlayerView
+        android:textSize="20sp"
+        android:id="@+id/step_no"
+        app:layout_constraintTop_toBottomOf="@+id/step_video_player"
+        android:padding="10dp"
+        android:paddingLeft="25dp"
+        />
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:id="@+id/step_video_player"></com.google.android.exoplayer2.ui.PlayerView>
+        android:layout_height="wrap_content"
+        android:id="@+id/step_full_desc"
+        app:layout_constraintTop_toBottomOf="@+id/step_no"
+        android:padding="10dp"
+        android:textSize="20sp"
+        android:paddingLeft="20dp"
+        android:layout_margin="15dp"/>
 
 </android.support.constraint.ConstraintLayout>

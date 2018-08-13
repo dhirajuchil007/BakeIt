@@ -21,6 +21,7 @@ public class RecipeSteps extends AppCompatActivity implements RecipeStepsAdapter
         recipeFragment.setIngredientsArrayList(recipe.ingredientsList);
         recipeFragment.setSteps(recipe.stepsList);
         FragmentManager fragmentManager=getSupportFragmentManager();
+        if(savedInstanceState==null)
         fragmentManager.beginTransaction().add(R.id.recipe_steps,recipeFragment).commit();
     }
 

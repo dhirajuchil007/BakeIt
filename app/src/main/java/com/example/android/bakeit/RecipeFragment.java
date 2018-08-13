@@ -59,10 +59,19 @@ public static final String BACK_TAG="tag";
 
     @Override
     public void onClick(int position) {
-        Toast.makeText(getContext(),"test",Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getContext(),"test",Toast.LENGTH_SHORT).show();
         StepsFragment stepsFragment=new StepsFragment();
+        stepsFragment.setVideoLink(steps.get(position).videoUrl);
+        stepsFragment.setLongDesc(steps.get(position).description);
+        stepsFragment.setId(steps.get(position).id);
         FragmentManager fragmentManager=getFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.recipe_steps,stepsFragment).addToBackStack(BACK_TAG).commit();
+
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
 
     }
 }
