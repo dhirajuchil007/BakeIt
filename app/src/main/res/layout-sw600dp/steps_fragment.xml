@@ -8,7 +8,7 @@
 
     <com.google.android.exoplayer2.ui.PlayerView
         android:layout_width="match_parent"
-        android:layout_height="203dp"
+        android:layout_height="380dp"
         android:layout_margin="0dp"
         android:padding="0dp"
         android:id="@+id/step_video_player"></com.google.android.exoplayer2.ui.PlayerView>
@@ -16,9 +16,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="20sp"
+        android:id="@+id/step_no"
         android:background="@color/colorPrimary"
         android:textColor="#ffffff"
-        android:id="@+id/step_no"
         app:layout_constraintTop_toBottomOf="@+id/step_video_player"
         android:padding="10dp"
         android:paddingLeft="25dp"

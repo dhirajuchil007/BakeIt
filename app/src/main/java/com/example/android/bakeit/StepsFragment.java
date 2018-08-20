@@ -41,6 +41,8 @@ public class StepsFragment extends Fragment {
     public static final String STEP_NO="stepnumber";
     public static final String DESC="desc";
     public static final String VIDEO_LINK="videolink";
+    private boolean mTwoPane;
+
 
 
 
@@ -56,6 +58,8 @@ public class StepsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Bundle bundle=getArguments();
+        mTwoPane=bundle.getBoolean(RecipeSteps.TWO_PANE);
 
         stepNo=view.findViewById(R.id.step_no);
         longDescTextview=view.findViewById(R.id.step_full_desc);
@@ -65,7 +69,7 @@ public class StepsFragment extends Fragment {
             longDesc=savedInstanceState.getString(DESC);
             videoLink=savedInstanceState.getString(VIDEO_LINK);
         }
-        if(getResources().getConfiguration().orientation!= Configuration.ORIENTATION_LANDSCAPE) {
+        if(getResources().getConfiguration().orientation!= Configuration.ORIENTATION_LANDSCAPE||mTwoPane) {
             stepNo.setText(getContext().getString(R.string.steps) + String.valueOf(id));
             longDescTextview.setText(longDesc);
         }
@@ -110,7 +114,7 @@ public class StepsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if(getResources().getConfiguration().orientation== Configuration.ORIENTATION_LANDSCAPE)
+        if(getResources().getConfiguration().orientation== Configuration.ORIENTATION_LANDSCAPE&&!mTwoPane)
        hideSystemUi();
         if ((Util.SDK_INT <= 23 || player == null)) {
             initializePlayer();
@@ -155,13 +159,12 @@ public class StepsFragment extends Fragment {
     }
 
     public void setLongDesc(String longDesc) {
-        this.longDesc = longDesc;
+        this.longDesc = longDesc.substring(longDesc.indexOf(".")+1);
+
     }
 
     public void setId(int id) {
-        if(id==0)
-            id=1;
-        else
-        this.id = id;
+
+        this.id = id+1;
     }
 }

@@ -21,6 +21,9 @@ public class RecipeFragment extends Fragment implements RecipeStepsAdapter.OnRec
 ArrayList<Steps> steps;
 ArrayList<Ingredients> ingredientsArrayList;
 public static final String BACK_TAG="tag";
+public static final String LIST_STEPS="steplist";
+    Bundle bundle;
+private boolean mTwoPane;
 
     public RecipeFragment(){}
 
@@ -29,6 +32,9 @@ public static final String BACK_TAG="tag";
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootview=inflater.inflate(R.layout.recipe_fragment,container,false);
         Log.d(TAG, "onCreateView: ");
+         bundle=getArguments();
+        mTwoPane=bundle.getBoolean(RecipeSteps.TWO_PANE);
+
 
         return rootview;
     }
@@ -40,6 +46,8 @@ public static final String BACK_TAG="tag";
 
         RecyclerView recipeSteps=(RecyclerView)view.findViewById(R.id.recipe_recycler_view);
         recipeSteps.setLayoutManager(layoutManager);
+        if(savedInstanceState!=null)
+            steps=savedInstanceState.getParcelableArrayList(LIST_STEPS);
         RecipeStepsAdapter recipeStepsAdapter=new RecipeStepsAdapter(steps,getContext());
 
         recipeSteps.setAdapter(recipeStepsAdapter);
@@ -60,11 +68,16 @@ public static final String BACK_TAG="tag";
     @Override
     public void onClick(int position) {
         //Toast.makeText(getContext(),"test",Toast.LENGTH_SHORT).show();
+
         StepsFragment stepsFragment=new StepsFragment();
         stepsFragment.setVideoLink(steps.get(position).videoUrl);
         stepsFragment.setLongDesc(steps.get(position).description);
         stepsFragment.setId(steps.get(position).id);
+        stepsFragment.setArguments(bundle);
         FragmentManager fragmentManager=getFragmentManager();
+        if(mTwoPane)
+            fragmentManager.beginTransaction().replace(R.id.step_viewer,stepsFragment).commit();
+        else
         fragmentManager.beginTransaction().replace(R.id.recipe_steps,stepsFragment).addToBackStack(BACK_TAG).commit();
 
     }
@@ -72,6 +85,7 @@ public static final String BACK_TAG="tag";
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(LIST_STEPS,steps);
 
     }
 }
