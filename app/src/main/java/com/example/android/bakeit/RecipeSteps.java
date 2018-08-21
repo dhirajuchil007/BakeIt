@@ -4,6 +4,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -53,4 +54,5 @@ public static final String TWO_PANE="twopane";
     public void onClick(int position) {
         Toast.makeText(this,"text",Toast.LENGTH_SHORT);
     }
+
 }

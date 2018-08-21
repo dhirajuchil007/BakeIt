@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -22,6 +23,7 @@ ArrayList<Steps> steps;
 ArrayList<Ingredients> ingredientsArrayList;
 public static final String BACK_TAG="tag";
 public static final String LIST_STEPS="steplist";
+public static final String LIST_ING="ingredientslist";
     Bundle bundle;
 private boolean mTwoPane;
 
@@ -46,12 +48,30 @@ private boolean mTwoPane;
 
         RecyclerView recipeSteps=(RecyclerView)view.findViewById(R.id.recipe_recycler_view);
         recipeSteps.setLayoutManager(layoutManager);
-        if(savedInstanceState!=null)
-            steps=savedInstanceState.getParcelableArrayList(LIST_STEPS);
+        if(savedInstanceState!=null) {
+            steps = savedInstanceState.getParcelableArrayList(LIST_STEPS);
+            ingredientsArrayList=savedInstanceState.getParcelableArrayList(LIST_ING);
+        }
         RecipeStepsAdapter recipeStepsAdapter=new RecipeStepsAdapter(steps,getContext());
 
         recipeSteps.setAdapter(recipeStepsAdapter);
         recipeStepsAdapter.setOnRecipleClicked(RecipeFragment.this);
+        CardView cardView=view.findViewById(R.id.ingredients_card);
+        cardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                IngredientsFragment ingredientsFragment=new IngredientsFragment();
+                ingredientsFragment.setIngredientsArrayList(ingredientsArrayList);
+                FragmentManager fragmentManager=getFragmentManager();
+
+                if(mTwoPane)
+                    fragmentManager.beginTransaction().replace(R.id.step_viewer,ingredientsFragment).commit();
+                else
+                    fragmentManager.beginTransaction().replace(R.id.recipe_steps,ingredientsFragment).addToBackStack(BACK_TAG).commit();
+
+
+            }
+        });
 
 
     }
@@ -82,10 +102,17 @@ private boolean mTwoPane;
 
     }
 
+
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelableArrayList(LIST_STEPS,steps);
+        outState.putParcelableArrayList(LIST_ING,ingredientsArrayList);
+
+    }
+    public void showIngredients(View view){
+
+
 
     }
 }

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/ingredients"
+        android:textAlignment="center"
+        android:textSize="23sp"
+        android:padding="10dp"
+        android:id="@+id/ing_text"/>
+   <ListView
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:id="@+id/ing_list_view"
+       app:layout_constraintTop_toBottomOf="@+id/ing_text"></ListView>
+
+</android.support.constraint.ConstraintLayout>
