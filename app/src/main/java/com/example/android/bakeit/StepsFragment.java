@@ -65,75 +65,71 @@ public class StepsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        final Bundle bundle=getArguments();
-        mTwoPane=bundle.getBoolean(RecipeSteps.TWO_PANE);
+        final Bundle bundle = getArguments();
+        mTwoPane = bundle.getBoolean(RecipeSteps.TWO_PANE);
 
-        stepNo=view.findViewById(R.id.step_no);
-        longDescTextview=view.findViewById(R.id.step_full_desc);
-        if(savedInstanceState!=null)
-        {
-            id=savedInstanceState.getInt(STEP_NO);
-            longDesc=savedInstanceState.getString(DESC);
-            videoLink=savedInstanceState.getString(VIDEO_LINK);
-            stepsArrayList=savedInstanceState.getParcelableArrayList(STEP_LIST);
+        stepNo = view.findViewById(R.id.step_no);
+        longDescTextview = view.findViewById(R.id.step_full_desc);
+        if (savedInstanceState != null) {
+            id = savedInstanceState.getInt(STEP_NO);
+            longDesc = savedInstanceState.getString(DESC);
+            videoLink = savedInstanceState.getString(VIDEO_LINK);
+            stepsArrayList = savedInstanceState.getParcelableArrayList(STEP_LIST);
         }
-        if(getResources().getConfiguration().orientation!= Configuration.ORIENTATION_LANDSCAPE||mTwoPane) {
+        if (getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE || mTwoPane) {
             stepNo.setText(getContext().getString(R.string.steps) + String.valueOf(id));
             longDescTextview.setText(longDesc);
         }
 
-        mPlayerView=view.findViewById(R.id.step_video_player);
-        Log.d(TAG, "initializePlayer: "+videoLink);
-        final Button prevButton=view.findViewById(R.id.prev_button);
-        Button nextButton=view.findViewById(R.id.next_button);
-        prevButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(id!=1)
-                {
-                    Steps prevStep=stepsArrayList.get(id-2);
-                    StepsFragment stepsFragment=new StepsFragment();
-                    stepsFragment.setId(prevStep.id);
-                    stepsFragment.setVideoLink(prevStep.videoUrl);
-                    stepsFragment.setLongDesc(prevStep.description);
-                    stepsFragment.setArguments(bundle);
-                    stepsFragment.setStepList(stepsArrayList);
-                    FragmentManager fragmentManager=getFragmentManager();
-                    fragmentManager.beginTransaction().replace(R.id.recipe_steps,stepsFragment).commit();
+        mPlayerView = view.findViewById(R.id.step_video_player);
+        Log.d(TAG, "initializePlayer: " + videoLink);
+        if (!mTwoPane) {
+            final Button prevButton = view.findViewById(R.id.prev_button);
+            Button nextButton = view.findViewById(R.id.next_button);
+            prevButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (id != 1) {
+                        Steps prevStep = stepsArrayList.get(id - 2);
+                        StepsFragment stepsFragment = new StepsFragment();
+                        stepsFragment.setId(prevStep.id);
+                        stepsFragment.setVideoLink(prevStep.videoUrl);
+                        stepsFragment.setLongDesc(prevStep.description);
+                        stepsFragment.setArguments(bundle);
+                        stepsFragment.setStepList(stepsArrayList);
+                        FragmentManager fragmentManager = getFragmentManager();
+                        fragmentManager.beginTransaction().replace(R.id.recipe_steps, stepsFragment).commit();
 
 
+                    } else {
+                        Toast.makeText(getContext(), getContext().getResources().getString(R.string.fist_step_reached), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+            nextButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (id < stepsArrayList.size()) {
+                        Steps prevStep = stepsArrayList.get(id);
+                        StepsFragment stepsFragment = new StepsFragment();
+                        stepsFragment.setId(prevStep.id);
+                        stepsFragment.setVideoLink(prevStep.videoUrl);
+                        stepsFragment.setLongDesc(prevStep.description);
+                        stepsFragment.setArguments(bundle);
+                        stepsFragment.setStepList(stepsArrayList);
+                        FragmentManager fragmentManager = getFragmentManager();
+                        fragmentManager.beginTransaction().replace(R.id.recipe_steps, stepsFragment).commit();
+                    } else {
+                        Toast.makeText(getContext(), getContext().getResources().getString(R.string.last_step_reached), Toast.LENGTH_SHORT).show();
+                    }
 
                 }
-                else {
-                    Toast.makeText(getContext(),getContext().getResources().getString(R.string.fist_step_reached),Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-        nextButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(id<stepsArrayList.size())
-                {
-                    Steps prevStep=stepsArrayList.get(id);
-                    StepsFragment stepsFragment=new StepsFragment();
-                    stepsFragment.setId(prevStep.id);
-                    stepsFragment.setVideoLink(prevStep.videoUrl);
-                    stepsFragment.setLongDesc(prevStep.description);
-                    stepsFragment.setArguments(bundle);
-                    stepsFragment.setStepList(stepsArrayList);
-                    FragmentManager fragmentManager=getFragmentManager();
-                    fragmentManager.beginTransaction().replace(R.id.recipe_steps,stepsFragment).commit();
-                }
-                else
-                {
-                    Toast.makeText(getContext(),getContext().getResources().getString(R.string.last_step_reached),Toast.LENGTH_SHORT).show();
-                }
-
-            }
-        });
+            });
 
 
+        }
     }
+
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
