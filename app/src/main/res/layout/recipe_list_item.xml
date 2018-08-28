@@ -13,9 +13,10 @@
     android:layout_height="match_parent">
     <ImageView
         android:layout_width="match_parent"
-        android:layout_height="180dp"
-        android:src="@mipmap/ic_launcher"
-        android:background="@drawable/side_nav_bar"
+        android:layout_height="190dp"
+
+
+
         android:id="@+id/recipe_thumbnail"
 
         />
@@ -24,23 +25,31 @@
         android:layout_height="match_parent"
         android:background="@android:color/white"
         android:layout_alignParentRight="true"
-        android:alpha="0.7"/>
+        android:alpha="0.2"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
             android:padding="5dp"
         android:textSize="25sp"
+        android:layout_marginTop="65dp"
+        android:layout_centerHorizontal="true"
         android:textStyle="bold"
 
         android:id="@+id/recipe_name"/>
     <TextView
-        android:layout_width="wrap_content"
+
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+
+
+
         android:layout_alignParentBottom="true"
         android:paddingLeft="10dp"
         android:id="@+id/download_tv"
         android:text="@string/download_button_text"
-        android:paddingBottom="10dp"/>
+
+        android:paddingBottom="8dp"
+        android:paddingTop="8dp"/>
 
 </RelativeLayout>
 

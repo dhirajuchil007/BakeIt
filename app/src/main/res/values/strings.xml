@@ -9,9 +9,16 @@
     <string name="ingredients">Ingredients</string>
     <string name="steps">Step:</string>
     <string name="download_button_text">Download</string>
-    <string name="internet_error_message">Pleasehcek your internet connection and try again</string>
+    <string name="download_done_string">Available offline</string>
+    <string name="download_shared_pref" translatable="false">downloadcomplete</string>
+
+    <string name="internet_error_message">Please check your internet connection and try again</string>
     <string name="landscape">no</string>
     <string name="of">of</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
+    <string name="prev_button_text">Prev</string>
+    <string name="fist_step_reached">This is the first step</string>
+    <string name="last_step_reached">This is the final step. Well Done!</string>
+<string name="next_button_text">Next</string>
 </resources>

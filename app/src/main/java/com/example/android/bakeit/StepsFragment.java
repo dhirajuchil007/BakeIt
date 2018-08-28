@@ -7,11 +7,14 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
@@ -24,6 +27,8 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+
+import java.util.ArrayList;
 
 import static android.support.constraint.Constraints.TAG;
 
@@ -41,7 +46,9 @@ public class StepsFragment extends Fragment {
     public static final String STEP_NO="stepnumber";
     public static final String DESC="desc";
     public static final String VIDEO_LINK="videolink";
+    public static final String STEP_LIST="steplist";
     private boolean mTwoPane;
+    private ArrayList<Steps> stepsArrayList;
 
 
 
@@ -58,7 +65,7 @@ public class StepsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Bundle bundle=getArguments();
+        final Bundle bundle=getArguments();
         mTwoPane=bundle.getBoolean(RecipeSteps.TWO_PANE);
 
         stepNo=view.findViewById(R.id.step_no);
@@ -68,6 +75,7 @@ public class StepsFragment extends Fragment {
             id=savedInstanceState.getInt(STEP_NO);
             longDesc=savedInstanceState.getString(DESC);
             videoLink=savedInstanceState.getString(VIDEO_LINK);
+            stepsArrayList=savedInstanceState.getParcelableArrayList(STEP_LIST);
         }
         if(getResources().getConfiguration().orientation!= Configuration.ORIENTATION_LANDSCAPE||mTwoPane) {
             stepNo.setText(getContext().getString(R.string.steps) + String.valueOf(id));
@@ -76,6 +84,53 @@ public class StepsFragment extends Fragment {
 
         mPlayerView=view.findViewById(R.id.step_video_player);
         Log.d(TAG, "initializePlayer: "+videoLink);
+        final Button prevButton=view.findViewById(R.id.prev_button);
+        Button nextButton=view.findViewById(R.id.next_button);
+        prevButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(id!=1)
+                {
+                    Steps prevStep=stepsArrayList.get(id-2);
+                    StepsFragment stepsFragment=new StepsFragment();
+                    stepsFragment.setId(prevStep.id);
+                    stepsFragment.setVideoLink(prevStep.videoUrl);
+                    stepsFragment.setLongDesc(prevStep.description);
+                    stepsFragment.setArguments(bundle);
+                    stepsFragment.setStepList(stepsArrayList);
+                    FragmentManager fragmentManager=getFragmentManager();
+                    fragmentManager.beginTransaction().replace(R.id.recipe_steps,stepsFragment).commit();
+
+
+
+                }
+                else {
+                    Toast.makeText(getContext(),getContext().getResources().getString(R.string.fist_step_reached),Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(id<stepsArrayList.size())
+                {
+                    Steps prevStep=stepsArrayList.get(id);
+                    StepsFragment stepsFragment=new StepsFragment();
+                    stepsFragment.setId(prevStep.id);
+                    stepsFragment.setVideoLink(prevStep.videoUrl);
+                    stepsFragment.setLongDesc(prevStep.description);
+                    stepsFragment.setArguments(bundle);
+                    stepsFragment.setStepList(stepsArrayList);
+                    FragmentManager fragmentManager=getFragmentManager();
+                    fragmentManager.beginTransaction().replace(R.id.recipe_steps,stepsFragment).commit();
+                }
+                else
+                {
+                    Toast.makeText(getContext(),getContext().getResources().getString(R.string.last_step_reached),Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
 
 
     }
@@ -86,6 +141,7 @@ public class StepsFragment extends Fragment {
         outState.putInt(STEP_NO,id);
         outState.putString(DESC,longDesc);
         outState.putString(VIDEO_LINK,videoLink);
+        outState.putParcelableArrayList(STEP_LIST,stepsArrayList);
     }
 
     private void initializePlayer(){
@@ -166,5 +222,10 @@ public class StepsFragment extends Fragment {
     public void setId(int id) {
 
         this.id = id+1;
+    }
+    public void setStepList(ArrayList<Steps> stepList){
+
+        stepsArrayList=stepList;
+
     }
 }

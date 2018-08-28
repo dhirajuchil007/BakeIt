@@ -93,6 +93,7 @@ private boolean mTwoPane;
         stepsFragment.setVideoLink(steps.get(position).videoUrl);
         stepsFragment.setLongDesc(steps.get(position).description);
         stepsFragment.setId(steps.get(position).id);
+        stepsFragment.setStepList(steps);
         stepsFragment.setArguments(bundle);
         FragmentManager fragmentManager=getFragmentManager();
         if(mTwoPane)

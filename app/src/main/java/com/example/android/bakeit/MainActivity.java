@@ -1,16 +1,18 @@
 package com.example.android.bakeit;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -19,7 +21,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.android.bakeit.utils.NetworkUtils;
@@ -36,6 +37,10 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,RecipeAdapter.OnItemClicked
@@ -43,16 +48,25 @@ public class MainActivity extends AppCompatActivity
     public static final String TAG="mainactivity";
     private final static String BAKE_QUERY="https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json";
     public static final String RECIPE_JSON="recipies";
+    public static final String DOWNLOAD_SET="downloadset";
+    public static final int MY_PERMISSIONS_REQUEST_WRITE_STORAGE =100;
+    Set defaultSet;
 RecyclerView recipeRecyclerView;
 RecipeAdapter recipeAdapter;
 ArrayList<Recipe> recipeArrayList;
+AppDatabase mDb;
+SharedPreferences sharedPreferences;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        mDb=AppDatabase.getsInstance(this);
         setSupportActionBar(toolbar);
+        recipeArrayList=new ArrayList<>();
+        defaultSet=new HashSet();
 
+sharedPreferences=this.getSharedPreferences(getString(R.string.download_shared_pref), Context.MODE_PRIVATE);
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -159,16 +173,105 @@ ArrayList<Recipe> recipeArrayList;
     public void onItemClick(int position) {
         Intent intent=new Intent(this,RecipeSteps.class);
         Gson gson=new Gson();
+        Log.d(TAG, "onItemClick: ");
         String recString=gson.toJson(recipeArrayList.get(position));
         intent.putExtra(RECIPE_JSON,recString);
         startActivity(intent);
 
     }
 
+
     @Override
-    public void onButtonClicked() {
-        Toast.makeText(this,"download clicked",Toast.LENGTH_SHORT).show();
+    public void onButtonClicked(final Recipe recipe) {
+
+    Set <String>set=sharedPreferences.getStringSet(DOWNLOAD_SET,defaultSet);
+    SharedPreferences.Editor editor=sharedPreferences.edit();
+        Log.d(TAG, "onButtonClicked: "+set.toString());
+    if(!set.contains(Integer.toString(recipe.id))) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                mDb.recipieDao().insert(recipe);
+            }
+        }).start();
+        set.add(Integer.toString(recipe.id));
+        editor.putStringSet(DOWNLOAD_SET,set);
+        editor.commit();
+        recipeAdapter.notifyDataSetChanged();
     }
+    else
+    {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mDb.recipieDao().delete(recipe);
+            }
+        }).start();
+        set.remove(Integer.toString(recipe.id));
+        editor.putStringSet(DOWNLOAD_SET,set);
+        editor.commit();
+        recipeAdapter.notifyDataSetChanged();
+
+    }
+
+
+    }
+    public void setAdapterFromDB() throws JSONException{
+
+
+        List<Recipe> recipeList=mDb.recipieDao().getAllRecipies();
+        Iterator<Recipe> itr=recipeList.iterator();
+    //    Log.d(TAG, "setAdapterFromDB: "+recipeList.size());
+        while (itr.hasNext())
+        {
+           Recipe recipe= itr.next();
+            ArrayList<Ingredients> ing=createINGArrayList(new JSONArray(recipe.ingredientsJson));
+            ArrayList<Steps> step=createStepArrayList(new JSONArray(recipe.stepJson));
+            recipeArrayList.add(new Recipe(ing,recipe.id,recipe.recipeName,step,recipe.servings,recipe.image,recipe.stepJson,recipe.ingredientsJson));
+
+
+        }
+        recipeAdapter=new RecipeAdapter(recipeArrayList,this);
+        Log.d(TAG, "setAdapterFromDB: "+recipeArrayList.size());
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                recipeRecyclerView.setAdapter(recipeAdapter);
+                recipeAdapter.setOnClick(MainActivity.this);
+
+            }
+        });
+
+
+
+
+    }
+    public ArrayList<Ingredients> createINGArrayList(JSONArray ingArray) throws JSONException{
+        ArrayList<Ingredients> ing=new ArrayList<>();
+        for(int j=0;j<ingArray.length();j++)
+        {
+            ing.add(new Ingredients(ingArray.getJSONObject(j).getString("ingredient")
+                    ,ingArray.getJSONObject(j).getString("measure")
+                    ,ingArray.getJSONObject(j).getDouble("quantity")));
+        }
+        return ing;
+
+    }
+    public ArrayList<Steps> createStepArrayList(JSONArray steps)throws JSONException{
+        ArrayList<Steps> ste=new ArrayList<>();
+        for(int k=0;k<steps.length();k++)
+        {
+            ste.add(new Steps(k,
+                    steps.getJSONObject(k).getString("shortDescription")
+                    ,steps.getJSONObject(k).getString("description"),
+                    steps.getJSONObject(k).getString("videoURL"),
+                    steps.getJSONObject(k).getString("thumbnailURL")));
+        }
+        return ste;
+
+    }
+
 
     class GetRecipes extends AsyncTask<URL,Void,ArrayList<Recipe>>{
 
@@ -204,24 +307,13 @@ ArrayList<Recipe> recipeArrayList;
                         String image=jsonObject.getString("image");
                         JSONArray ingArray=jsonObject.getJSONArray("ingredients");
                         JSONArray steps=jsonObject.getJSONArray("steps");
-                        ArrayList<Ingredients> ing=new ArrayList();
-                        ArrayList<Steps> ste=new ArrayList();
-                        for(int j=0;j<ingArray.length();j++)
-                        {
-                            ing.add(new Ingredients(ingArray.getJSONObject(j).getString("ingredient")
-                                    ,ingArray.getJSONObject(j).getString("measure")
-                                    ,ingArray.getJSONObject(j).getDouble("quantity")));
-                        }
-                        for(int k=0;k<steps.length();k++)
-                        {
-                            ste.add(new Steps(steps.getJSONObject(k).getInt("id"),
-                                    steps.getJSONObject(k).getString("shortDescription")
-                                    ,steps.getJSONObject(k).getString("description"),
-                                    steps.getJSONObject(k).getString("videoURL"),
-                                    steps.getJSONObject(k).getString("thumbnailURL")));
-                        }
-                        recipes.add(new Recipe(ing,id,name,ste,servings,image));
-                        Log.d(TAG, "doInBackground: "+name);
+                        ArrayList<Ingredients> ing=createINGArrayList(ingArray);
+                        ArrayList<Steps> ste=createStepArrayList(steps);
+
+
+                        recipes.add(new Recipe(ing,id,name,ste,servings,image,steps.toString(),ingArray.toString()));
+                        Log.d(TAG, "doInBackground: "+steps.toString());
+                      //  Log.d(TAG, "doInBackground: "+name);
 
 
                     }
@@ -255,12 +347,25 @@ ArrayList<Recipe> recipeArrayList;
             if(recipes!=null)
             {
                 recipeArrayList=recipes;
-                recipeAdapter=new RecipeAdapter(recipes);
+                recipeAdapter=new RecipeAdapter(recipes,MainActivity.this);
                 recipeRecyclerView.setAdapter(recipeAdapter);
                 recipeAdapter.setOnClick(MainActivity.this);
             }
             else{
                 Toast toast=Toast.makeText(MainActivity.this,getString(R.string.internet_error_message),Toast.LENGTH_SHORT);
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            try {
+                                setAdapterFromDB();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
+
 
                 toast.show();
             }

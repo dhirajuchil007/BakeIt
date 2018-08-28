@@ -17,6 +17,7 @@ public static final String TWO_PANE="twopane";
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_steps);
+
         if(findViewById(R.id.tab_linear_layout)!=null)
         {
             mTwoPane=true;
@@ -35,6 +36,7 @@ public static final String TWO_PANE="twopane";
         if(savedInstanceState==null)
         fragmentManager.beginTransaction().add(R.id.recipe_steps,recipeFragment).commit();
 
+
         if(mTwoPane)
         {
             Log.d(TAG, "onCreate: recipestep"+recipe.stepsList.get(0).description);
@@ -44,6 +46,7 @@ public static final String TWO_PANE="twopane";
             stepsFragment.setVideoLink(recipe.stepsList.get(0).videoUrl);
 
             stepsFragment.setArguments(bundle);
+            stepsFragment.setStepList(recipe.stepsList);
             fragmentManager.beginTransaction().add(R.id.step_viewer,stepsFragment).commit();
 
 
