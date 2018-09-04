@@ -4,9 +4,26 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+
+
     <com.google.android.exoplayer2.ui.PlayerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/step_video_player"></com.google.android.exoplayer2.ui.PlayerView>
-
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="172dp"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/text_size_error_msg"
+        android:visibility="invisible"
+        android:id="@+id/error_msg"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/step_video_player"
+        app:layout_constraintHorizontal_bias="0.493"
+        app:layout_constraintStart_toStartOf="@+id/step_video_player"
+        app:layout_constraintTop_toTopOf="@+id/step_video_player"
+        app:layout_constraintVertical_bias="0.0" />
 </android.support.constraint.ConstraintLayout>

@@ -49,6 +49,7 @@ public class StepsFragment extends Fragment {
     public static final String STEP_LIST="steplist";
     private boolean mTwoPane;
     private ArrayList<Steps> stepsArrayList;
+    private TextView message;
 
 
 
@@ -67,6 +68,7 @@ public class StepsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         final Bundle bundle = getArguments();
         mTwoPane = bundle.getBoolean(RecipeSteps.TWO_PANE);
+        message=view.findViewById(R.id.error_msg);
 
         stepNo = view.findViewById(R.id.step_no);
         longDescTextview = view.findViewById(R.id.step_full_desc);
@@ -76,6 +78,7 @@ public class StepsFragment extends Fragment {
             videoLink = savedInstanceState.getString(VIDEO_LINK);
             stepsArrayList = savedInstanceState.getParcelableArrayList(STEP_LIST);
         }
+        Log.d(TAG, "onViewCreated: "+videoLink);
         if (getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE || mTwoPane) {
             stepNo.setText(getContext().getString(R.string.steps) + String.valueOf(id));
             longDescTextview.setText(longDesc);
@@ -83,7 +86,7 @@ public class StepsFragment extends Fragment {
 
         mPlayerView = view.findViewById(R.id.step_video_player);
         Log.d(TAG, "initializePlayer: " + videoLink);
-        if (!mTwoPane) {
+        if (!mTwoPane&&getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE) {
             final Button prevButton = view.findViewById(R.id.prev_button);
             Button nextButton = view.findViewById(R.id.next_button);
             prevButton.setOnClickListener(new View.OnClickListener() {
@@ -143,12 +146,41 @@ public class StepsFragment extends Fragment {
     private void initializePlayer(){
         player= ExoPlayerFactory.newSimpleInstance(new DefaultRenderersFactory(getContext()),new DefaultTrackSelector(),new DefaultLoadControl());
         mPlayerView.setPlayer(player);
-        player.setPlayWhenReady(playWhenReady);
-        player.seekTo(currentWindow,playBAckPosition);
-        Uri uri= Uri.parse(videoLink);
+        if(videoLink==null||videoLink==""||videoLink.length()==0||videoLink.isEmpty())
+        {
+            mPlayerView.hideController();
+            message.setVisibility(View.VISIBLE);
+            message.setText(getContext().getString(R.string.url_not_found));
+            Log.d(TAG, "initializePlayer: "+"lol");
 
-        MediaSource mediaSource=buildMediaSource(uri);
-        player.prepare(mediaSource,true,true);
+        }
+
+        else {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+
+                    if(!MainActivity.isOnline())
+                    {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mPlayerView.hideController();
+                                message.setVisibility(View.VISIBLE);
+                                message.setText(getContext().getString(R.string.offline_mode));
+
+                            }
+                        });
+                    }
+                }
+            }).start();
+            player.setPlayWhenReady(playWhenReady);
+            player.seekTo(currentWindow, playBAckPosition);
+            Uri uri = Uri.parse(videoLink);
+
+            MediaSource mediaSource = buildMediaSource(uri);
+            player.prepare(mediaSource, true, true);
+        }
     }
     private MediaSource buildMediaSource(Uri uri) {
         return new ExtractorMediaSource.Factory(

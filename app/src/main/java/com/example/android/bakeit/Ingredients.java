@@ -1,11 +1,15 @@
 package com.example.android.bakeit;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 public class Ingredients implements Parcelable{
     String name,measure;
     double quantity;
+    int recipeid;
+
 
     public Ingredients(String name, String measure, double quantity) {
         this.name = name;

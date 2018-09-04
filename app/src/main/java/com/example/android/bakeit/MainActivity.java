@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.test.espresso.IdlingResource;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
@@ -23,6 +24,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.example.android.bakeit.IdlingResource.SimpleIdlingResource;
 import com.example.android.bakeit.utils.NetworkUtils;
 import com.google.gson.Gson;
 
@@ -56,6 +58,14 @@ RecipeAdapter recipeAdapter;
 ArrayList<Recipe> recipeArrayList;
 AppDatabase mDb;
 SharedPreferences sharedPreferences;
+IdlingResource mIdlingResource;
+
+    public IdlingResource getIdlingResource() {
+        if (mIdlingResource == null) {
+            mIdlingResource = new SimpleIdlingResource();
+        }
+        return mIdlingResource;
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,8 +85,7 @@ sharedPreferences=this.getSharedPreferences(getString(R.string.download_shared_p
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+
         try {
             new GetRecipes().execute(new URL(BAKE_QUERY));
         } catch (MalformedURLException e) {
@@ -95,7 +104,7 @@ sharedPreferences=this.getSharedPreferences(getString(R.string.download_shared_p
         recipeRecyclerView.setLayoutManager( new LinearLayoutManager(getApplicationContext()));
 
 
-
+getIdlingResource();
 
     }
 
@@ -155,7 +164,7 @@ sharedPreferences=this.getSharedPreferences(getString(R.string.download_shared_p
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-    private boolean isOnline() {
+    public static boolean isOnline() {
         try {
             int timeoutMs = 1500;
 
@@ -223,10 +232,10 @@ sharedPreferences=this.getSharedPreferences(getString(R.string.download_shared_p
         List<Recipe> recipeList=mDb.recipieDao().getAllRecipies();
         Iterator<Recipe> itr=recipeList.iterator();
     //    Log.d(TAG, "setAdapterFromDB: "+recipeList.size());
-        while (itr.hasNext())
-        {
-           Recipe recipe= itr.next();
-            ArrayList<Ingredients> ing=createINGArrayList(new JSONArray(recipe.ingredientsJson));
+            while (itr.hasNext())
+            {
+               Recipe recipe= itr.next();
+                ArrayList<Ingredients> ing=createINGArrayList(new JSONArray(recipe.ingredientsJson));
             ArrayList<Steps> step=createStepArrayList(new JSONArray(recipe.stepJson));
             recipeArrayList.add(new Recipe(ing,recipe.id,recipe.recipeName,step,recipe.servings,recipe.image,recipe.stepJson,recipe.ingredientsJson));
 

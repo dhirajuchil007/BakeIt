@@ -13,7 +13,7 @@ public interface RecipeDAO {
     List<Recipe> getAllRecipies();
 
     @Query("select * from recipe where id=:id")
-           List<Recipe> getRecipeFromID(int id);
+           Recipe getRecipeFromID(int id);
 
     @Insert
     void insert(Recipe recipe);

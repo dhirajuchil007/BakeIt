@@ -39,6 +39,11 @@ public class Recipe {
         this.stepJson = stepJson;
         this.ingredientsJson = ingredientsJson;
     }
+    public Recipe(int id,String recipeName,ArrayList<Ingredients> ingredientsList){
+        this.id=id;
+        this.recipeName=recipeName;
+        this.ingredientsList=ingredientsList;
+    }
 
     public int getId() {
         return id;
