@@ -24,7 +24,7 @@ import static android.support.constraint.Constraints.TAG;
 public class IngredientsWidget extends AppWidgetProvider {
     static  AppDatabase mDb;
     public static final String CURRENT_ING_ID="idofcurrenting";
-
+static String id;
 
    static Recipe recipe;
 
@@ -37,13 +37,16 @@ public class IngredientsWidget extends AppWidgetProvider {
         // Construct the RemoteViews object
        // Log.d(TAG, "updateWidget: "+widgetText);
         final SharedPreferences preferences=context.getSharedPreferences(IngredientsWidgetConfigureActivity.PREFS_NAME,Context.MODE_PRIVATE);
-     final  String id= preferences.getString(IngredientsWidgetConfigureActivity.ING_REC_ID,"1");
+        id= preferences.getString(IngredientsWidgetConfigureActivity.ING_REC_ID,"0");
         Log.d(TAG, "updateAppWidget: "+id);
         new Thread(new Runnable() {
             @Override
             public void run() {
               recipe    =mDb.recipieDao().getRecipeFromID(Integer.parseInt(id));
+              if(recipe==null)
+                  return;
                 try {
+
                     ArrayList<Ingredients> ing=IngredientsWidgetConfigureActivity.createINGArrayList(new JSONArray(recipe.ingredientsJson));
 
 

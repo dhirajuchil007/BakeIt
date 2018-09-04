@@ -22,6 +22,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.bakeit.IdlingResource.SimpleIdlingResource;
@@ -45,7 +47,7 @@ import java.util.List;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,RecipeAdapter.OnItemClicked
+        implements RecipeAdapter.OnItemClicked
 {
     public static final String TAG="mainactivity";
     private final static String BAKE_QUERY="https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json";
@@ -59,6 +61,8 @@ ArrayList<Recipe> recipeArrayList;
 AppDatabase mDb;
 SharedPreferences sharedPreferences;
 IdlingResource mIdlingResource;
+TextView invisibleText;
+
 
     public IdlingResource getIdlingResource() {
         if (mIdlingResource == null) {
@@ -103,7 +107,7 @@ sharedPreferences=this.getSharedPreferences(getString(R.string.download_shared_p
 
         recipeRecyclerView.setLayoutManager( new LinearLayoutManager(getApplicationContext()));
 
-
+invisibleText=findViewById(R.id.invisible_text);
 getIdlingResource();
 
     }
@@ -140,30 +144,7 @@ getIdlingResource();
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
     public static boolean isOnline() {
         try {
             int timeoutMs = 1500;
@@ -230,30 +211,40 @@ getIdlingResource();
 
 
         List<Recipe> recipeList=mDb.recipieDao().getAllRecipies();
-        Iterator<Recipe> itr=recipeList.iterator();
-    //    Log.d(TAG, "setAdapterFromDB: "+recipeList.size());
-            while (itr.hasNext())
-            {
-               Recipe recipe= itr.next();
-                ArrayList<Ingredients> ing=createINGArrayList(new JSONArray(recipe.ingredientsJson));
-            ArrayList<Steps> step=createStepArrayList(new JSONArray(recipe.stepJson));
-            recipeArrayList.add(new Recipe(ing,recipe.id,recipe.recipeName,step,recipe.servings,recipe.image,recipe.stepJson,recipe.ingredientsJson));
-
-
-        }
-        recipeAdapter=new RecipeAdapter(recipeArrayList,this);
-        Log.d(TAG, "setAdapterFromDB: "+recipeArrayList.size());
-        runOnUiThread(new Runnable() {
+        if(recipeList==null||recipeList.size()==0)
+        {runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                recipeRecyclerView.setAdapter(recipeAdapter);
-                recipeAdapter.setOnClick(MainActivity.this);
-
+                invisibleText.setVisibility(View.VISIBLE);
+                invisibleText.setText(getString(R.string.invisible_text));
             }
         });
 
+        }
+        else {
+            Iterator<Recipe> itr = recipeList.iterator();
+            //    Log.d(TAG, "setAdapterFromDB: "+recipeList.size());
+            while (itr.hasNext()) {
+                Recipe recipe = itr.next();
+                ArrayList<Ingredients> ing = createINGArrayList(new JSONArray(recipe.ingredientsJson));
+                ArrayList<Steps> step = createStepArrayList(new JSONArray(recipe.stepJson));
+                recipeArrayList.add(new Recipe(ing, recipe.id, recipe.recipeName, step, recipe.servings, recipe.image, recipe.stepJson, recipe.ingredientsJson));
 
 
+            }
+            recipeAdapter = new RecipeAdapter(recipeArrayList, this);
+            Log.d(TAG, "setAdapterFromDB: " + recipeArrayList.size());
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    recipeRecyclerView.setAdapter(recipeAdapter);
+                    recipeAdapter.setOnClick(MainActivity.this);
+
+                }
+            });
+
+
+        }
 
     }
     public ArrayList<Ingredients> createINGArrayList(JSONArray ingArray) throws JSONException{

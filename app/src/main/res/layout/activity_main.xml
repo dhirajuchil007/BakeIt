@@ -7,6 +7,16 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     tools:openDrawer="start">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:textAlignment="center"
+        android:textSize="20dp"
+        android:visibility="invisible"
+        android:id="@+id/invisible_text"
+
+        />
 
 
 

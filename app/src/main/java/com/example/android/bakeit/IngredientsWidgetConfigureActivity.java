@@ -143,8 +143,9 @@ public class IngredientsWidgetConfigureActivity extends Activity {
                 resultValue.putExtra(ING_LIST,bundle);
                 Set set=new HashSet(res.ingredientsList);
                 SharedPreferences.Editor prefs = IngredientsWidgetConfigureActivity.this.getSharedPreferences(PREFS_NAME, 0).edit();
-                deleteTitlePref(IngredientsWidgetConfigureActivity.this,mAppWidgetId);
+
                                 prefs.putString(ING_REC_ID,String.valueOf(res.id)).apply();
+
 
                 setResult(RESULT_OK, resultValue);
                 finish();
