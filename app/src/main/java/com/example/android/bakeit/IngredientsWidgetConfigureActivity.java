@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,6 +37,7 @@ public class IngredientsWidgetConfigureActivity extends Activity {
     ListView listView;
     List<Recipe> recipeList;
     ArrayList<Recipe> recipeArrayList;
+    TextView errorMsg;
 
 
 
@@ -98,7 +100,9 @@ public class IngredientsWidgetConfigureActivity extends Activity {
         // out of the widget placement if the user presses the back button.
         setResult(RESULT_CANCELED);
 
+
         setContentView(R.layout.ingredients_widget_configure);
+        errorMsg=findViewById(R.id.tv_error_msg_widget);
         listView =findViewById(R.id.ingredients_chooser_for_widget);
          mDb=AppDatabase.getsInstance(this);
          recipeArrayList=new ArrayList<>();
@@ -123,6 +127,11 @@ public class IngredientsWidgetConfigureActivity extends Activity {
          }).start();
         RecipeWidgetAdapter recipeWidgetAdapter=new RecipeWidgetAdapter(IngredientsWidgetConfigureActivity.this,R.id.ingredients_chooser_for_widget,recipeArrayList);
         listView.setAdapter(recipeWidgetAdapter);
+        if(recipeArrayList==null||recipeArrayList.size()==0)
+        {
+            errorMsg.setVisibility(View.VISIBLE);
+        }
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

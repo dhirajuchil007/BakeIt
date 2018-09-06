@@ -47,6 +47,8 @@ public class StepsFragment extends Fragment {
     public static final String DESC="desc";
     public static final String VIDEO_LINK="videolink";
     public static final String STEP_LIST="steplist";
+    public static final String VIDEO_CURRENT_POSITION="currentposition";
+    public static final String PLAY_WHEN_READY="getplaywhenready";
     private boolean mTwoPane;
     private ArrayList<Steps> stepsArrayList;
     private TextView message;
@@ -77,6 +79,8 @@ public class StepsFragment extends Fragment {
             longDesc = savedInstanceState.getString(DESC);
             videoLink = savedInstanceState.getString(VIDEO_LINK);
             stepsArrayList = savedInstanceState.getParcelableArrayList(STEP_LIST);
+            playBAckPosition=savedInstanceState.getLong(VIDEO_CURRENT_POSITION);
+            playWhenReady=savedInstanceState.getBoolean(PLAY_WHEN_READY);
         }
         Log.d(TAG, "onViewCreated: "+videoLink);
         if (getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE || mTwoPane) {
@@ -141,11 +145,15 @@ public class StepsFragment extends Fragment {
         outState.putString(DESC,longDesc);
         outState.putString(VIDEO_LINK,videoLink);
         outState.putParcelableArrayList(STEP_LIST,stepsArrayList);
+        long xoplayerCurrentPosition=player.getCurrentPosition();
+        outState.putLong(VIDEO_CURRENT_POSITION,xoplayerCurrentPosition);
+        outState.putBoolean(PLAY_WHEN_READY,player.getPlayWhenReady());
     }
 
     private void initializePlayer(){
         player= ExoPlayerFactory.newSimpleInstance(new DefaultRenderersFactory(getContext()),new DefaultTrackSelector(),new DefaultLoadControl());
         mPlayerView.setPlayer(player);
+        message.setVisibility(View.INVISIBLE);
         if(videoLink==null||videoLink==""||videoLink.length()==0||videoLink.isEmpty())
         {
             mPlayerView.hideController();
@@ -174,12 +182,15 @@ public class StepsFragment extends Fragment {
                     }
                 }
             }).start();
+
+
+
             player.setPlayWhenReady(playWhenReady);
-            player.seekTo(currentWindow, playBAckPosition);
             Uri uri = Uri.parse(videoLink);
 
             MediaSource mediaSource = buildMediaSource(uri);
             player.prepare(mediaSource, true, true);
+            player.seekTo(currentWindow, playBAckPosition);
         }
     }
     private MediaSource buildMediaSource(Uri uri) {

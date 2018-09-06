@@ -11,6 +11,12 @@
         android:text="@string/choose"
         android:textAlignment="center"
         android:textSize="20sp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:id="@+id/tv_error_msg_widget"
+        android:text="@string/offline_error_msg"/>
 
     <ListView
         android:layout_width="match_parent"
