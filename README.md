@@ -1,5 +1,6 @@
 # BakeIt
-[!Screenshot](img/AFFIX_20181107_194907.png)
+<img src="img/AFFIX_20181107_194907.png"/>
+
 BakeIt app uses Android framework elements like Recyclerview, Fragments, Listview, Cardview , Libraries like exoplayer, Room, Picassoto provide a clean and simple user experience.
 The app is fully written in Java.
 
